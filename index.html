@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Multiplication up to 10 - Questions</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+        let questions;
+
+		// Function to generate questions and answers
+		const generateQuestions = () => {
+			const questions = [];
+
+			// Generate 10 questions
+			for (let i = 0; i < 10; i++) {
+				// Generate two random numbers between 1 and 10
+				const num1 = Math.floor(Math.random() * 10) + 1;
+				const num2 = Math.floor(Math.random() * 10) + 1;
+
+				// Calculate the correct answer
+				const correctAnswer = num1 * num2;
+
+				// Add question and answer to the list of questions
+				const question = `${num1} x ${num2} = ?`;
+				questions.push({question, answer: correctAnswer});
+			}
+
+			// Return the list of questions and answers
+			return questions;
+		};
+
+		// Function to display a random question
+		const showQuestion = () => {
+			// Select a random question
+			const { question, answer } = questions[Math.floor(Math.random() * questions.length)];
+
+			// Display the question
+			$("#question").text(question);
+
+			// Set the correct answer as a data attribute on the answer input element
+			$("#answer").attr("data-correct-answer", answer);
+		};
+
+        // Declare global variables to track correct answers and total questions
+        let numCorrect = 0;
+        let numQuestions = 0;
+
+        const checkAnswer = () => {
+            // Get the user's answer and the correct answer
+            const userAnswer = $("#answer").val();
+            const correctAnswer = $("#answer").attr("data-correct-answer");
+
+            // Get the current time
+            const time = new Date().toLocaleString();
+
+            // Update total number of questions
+            numQuestions++;
+
+            if (userAnswer == correctAnswer) {
+                // Update number of correct answers
+                numCorrect++;
+            }
+
+            // Update percentage of correct answers
+            const percentage = Math.round((numCorrect / numQuestions) * 100);
+            $("#percentage").text(`Percentage correct: ${percentage}%`);
+
+            // Check if the answer is correct
+            if (userAnswer == correctAnswer) {
+                // If the answer is correct, display a success message
+                $("#result").text("Correct!");
+
+                // Log the past question and answer
+                const pastQuestion = $("#question").text();
+                const pastAnswer = $("#answer").val();
+                $("#log").prepend(`<p>${time}: ${pastQuestion} = ${pastAnswer} (Correct) - ${percentage}%</p>`);
+            } else {
+                // If the answer is incorrect, display a failure message and the correct answer
+                $("#result").text(`Incorrect. The correct answer is ${correctAnswer}.`);
+
+                // Log the past question and answer
+                const pastQuestion = $("#question").text();
+                const pastAnswer = $("#answer").val();
+                $("#log").prepend(`<p>${time}: ${pastQuestion} = ${pastAnswer} (Incorrect) - ${percentage}%</p>`);
+            }
+
+
+
+            // Reset the question and answer input
+            showQuestion();
+            $("#answer").val("").focus();
+
+            // Save the log and statistics to local storage
+            localStorage.setItem("log", $("#log").html());
+            localStorage.setItem("numCorrect", numCorrect);
+            localStorage.setItem("numQuestions", numQuestions);
+        };
+
+		// Wait for the DOM to load
+		$(document).ready(() => {
+			// Generate the list of questions and answers
+			questions = generateQuestions();
+
+			// Show the first question
+			showQuestion();
+
+			// Add event listener to answer input to check the answer when the Enter key is pressed
+			$("#answer").keyup(event => {
+				if (event.key === "Enter") {
+					checkAnswer();
+				}
+			});
+
+            if (localStorage.getItem("log")) {
+                $("#log").html(localStorage.getItem("log"));
+                const time = new Date().toLocaleString();
+                $("#log").prepend(`<p>${time}: new session</p>`);
+            }
+
+			// Add event listener to Check Answer button
+			$("#check-answer-btn").click(checkAnswer);
+		});
+	</script>
+</head>
+<body>
+	<h1>Multiplication up to 10 - Questions</h1>
+
+	<p id="question"></p>
+
+	<label for="answer">Answer:</label>
+	<input type="text" id="answer" name="answer" autofocus>
+
+	<button type="button" id="check-answer-btn">Check Answer</button>
+
+	<p id="result"></p>
+
+    <p id="percentage"></p>
+
+    <p id="log"></p>
+</body>
+</html>
