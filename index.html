@@ -11,10 +11,10 @@
 			const questions = [];
 
 			// Generate 10 questions
-			for (let i = 0; i < 10; i++) {
-				// Generate two random numbers between 1 and 10
-				const num1 = Math.floor(Math.random() * 10) + 1;
-				const num2 = Math.floor(Math.random() * 10) + 1;
+			for (let i = 0; i < 10000; i++) {
+				// Generate two random numbers between 1 and 10 with large numbers more likely
+                const num1 = Math.random() < 0.6 ? Math.floor(Math.random() * 4) + 6 : Math.floor(Math.random() * 6) + 1;
+                const num2 = Math.random() < 0.6 ? Math.floor(Math.random() * 4) + 6 : Math.floor(Math.random() * 6) + 1;
 
 				// Calculate the correct answer
 				const correctAnswer = num1 * num2;
@@ -33,11 +33,16 @@
 			// Select a random question
 			const { question, answer } = questions[Math.floor(Math.random() * questions.length)];
 
-			// Display the question
-			$("#question").text(question);
+            if ($("#question").text() != question) {
+                // Display the question
+                $("#question").text(question);
 
-			// Set the correct answer as a data attribute on the answer input element
-			$("#answer").attr("data-correct-answer", answer);
+                // Set the correct answer as a data attribute on the answer input element
+                $("#answer").attr("data-correct-answer", answer);
+            } else {
+                showQuestion();
+            }
+
 		};
 
         // Declare global variables to track correct answers and total questions
